@@ -1,95 +1,78 @@
-# Shopping Cart Domain (TDD Engine)
+# 🧪 tdd-ai-lab
 
-A robust, specification-driven C# domain model for a Shopping Cart system, built using strict **Test-Driven Development (TDD)** practices and **Executable Specifications (Gherkin)**.
+> **A Laboratory for Deterministic, AI-Driven TDD Methodology.**  
+> *Executable Specs -> Red Tests (Human) -> Green Code (LLM) -> Automatic Rollback.*
 
----
+## 🎯 Manifesto & Core Principles
+
+Modern "Vibe Coding" and stateful chat-based AI development inevitably lead to **Loss of Intent**, **Context Drift**, and unmaintainable codebases. 
+
+`tdd-ai-lab` validates a strict, deterministic software engineering methodology where **LLM is not a partner in conversation, but a stateless code compilation unit**.
+
+### Key Rules
+1. **Stateless AI Execution:** Zero persistent memory in chat sessions. State is stored solely in the Git repository (Code, Tests, Specs).
+2. **Human Owns the Red Phase:** LLMs are strictly forbidden from writing unit tests or business constraints on their own from raw natural language.
+3. **Executable Specs First:** Business invariants and domain logic must be formalized in Git before any implementation begins.
+4. **Binary Compiler Arbitration:** Code is accepted ONLY if `dotnet test` returns `PASS` (Green). Any error or failing test leads to an immediate `git rollback`.
+
+## 🏗️ 3-Layer Architecture
+
+Knowledge and state are passed between iterations exclusively through **formal artifacts** (C#, Types, Executable Specs), never through ambiguous natural language prompts.
+
+Layer 1: Executable Specs & Invariants (Git / Markdown)
+   |
+   +--> (Human Domain Translation)
+   |
+Layer 2: Red Unit Tests & Rich Domain Types (xUnit/C#)
+   |
+   +--> (Stateless LLM Payload Trigger)
+   |
+Layer 3: Minimal Green Implementation (C# Code)
+
+### Layer 1: Executable Specifications (`docs/specs/`)
+Human-readable yet rigorous business invariants. Defines expected behaviors, boundary conditions, and domain rules.
+
+### Layer 2: Red Tests & Types (`src/Domain.Tests/`)
+Human-written Red tests translated from Layer 1. Enforces **Rich Domain Models** and Value Objects to make invalid system states unrepresentable.
+
+### Layer 3: Minimal Green Code (`src/Domain/`)
+LLM generates the absolute minimum C# implementation to pass the current failing test.
 
 ## 📂 Repository Structure
 
-```text
 tdd-ai-lab/
 ├── docs/
 │   └── specs/
-│       ├── discount-policy.feature
-│       ├── promo-code-policy.feature
-│       └── shopping-cart-policy.feature
+│       └── discount-policy.md      # Layer 1: Executable Specs & Invariants
 ├── src/
 │   ├── Domain/
-│   │   ├── Calculator.cs
-│   │   ├── Cart.cs
-│   │   ├── Domain.csproj
-│   │   ├── Item.cs
-│   │   └── PromoCode.cs
+│   │   ├── Item.cs                 # Layer 3: Implementation Code
+│   │   └── Calculator.cs
 │   └── Domain.Tests/
-│       ├── CalculatorTests.cs
-│       ├── CartTests.cs
-│       ├── Domain.Tests.csproj
-│       ├── ItemTests.cs
-│       └── PromoCodeTests.cs
-├── .gitignore
-├── README.md
-├── run-tdd-cycle.cmd
+│       ├── ItemTests.cs            # Layer 2: Red Phase (Type Invariants)
+│       └── CalculatorTests.cs      # Layer 2: Red Phase (Business Logic)
+├── scripts/
+│   └── generate_green.py            # Stateless AI execution trigger
+├── tdd-step.sh                      # Transactional CLI Arbiter (Red-Green-Rollback)
 └── tdd-ai-lab.sln
-```
 
----
+## 🔄 The Development Cycle (Step-by-Step)
 
-## 🏗 System Architecture
+[1. Edit Spec] -> [2. Write Red Test] -> [3. Run tdd-step.sh] -> [4. Commit / Rollback]
 
-The project follows a **3-Layer Living Documentation** approach:
+1. **Formalize Requirement:** Define or update a business rule in `docs/specs/*.md`.
+2. **Write RED Test (Human):** Add a failing test case in `src/Domain.Tests/`. Verify failure via `dotnet test`.
+3. **Trigger AI Generation:** Run the local transaction CLI:
+   ./tdd-step.sh "Implement percentage discount calculation"
+4. **Arbitration & Transaction:**
+   * If `dotnet test` **PASSES** -> Automatic Git Commit.
+   * If `dotnet test` **FAILS** -> Immediate `git checkout` (Rollback to clean state).
 
-1. **Layer 1: Executable Specifications (`docs/specs/*.feature`)**
-   - Formalized using standard Gherkin syntax (`Feature`, `Scenario Outline`, `Given-When-Then`).
-   - Serves as the single source of truth for business invariants.
-2. **Layer 2: Test Suite (`src/Domain.Tests/`)**
-   - Unit tests implemented with **xUnit** (`[Fact]`, `[Theory]`).
-   - Verifies all scenarios defined in Gherkin specs.
-3. **Layer 3: Domain Model (`src/Domain/`)**
-   - Clean C# domain primitives (`Item`, `PromoCode`, `Cart`) enforcing strict validation and business rules.
+## 🛠️ Stack
+* **Language:** C# / .NET 8+
+* **Testing Framework:** xUnit, FluentAssertions
+* **AI Engine:** Stateless API Payload (Claude / OpenAI / Local LLM)
+* **Control:** Bash / Git CLI Hooks
 
----
-
-## ⚙️ Tech Stack & Tooling
-
-- **Language**: C# / .NET 8
-- **Testing Framework**: xUnit (`Assert`)
-- **Specification Format**: Gherkin (`docs/specs/*.feature`)
-- **Automation Engine**: Custom `run-tdd-cycle.cmd` script for automated Red-Green-Rollback flow.
-
----
-
-## 📋 Core Business Rules
-
-### 1. Item Policy (`docs/specs/discount-policy.feature`)
-- **Price**: Must be non-negative (`Price >= 0`).
-- **Quantity**: Must be at least 1 (`Quantity >= 1`).
-- **Discount**: Item-level discount range is `0% - 100%`.
-- **Item Total Formula**:
-  $$\text{ItemTotal} = \text{Price} \times \text{Quantity} \times \left(1 - \frac{\text{Discount}}{100}\right)$$
-
-### 2. Promo Code Policy (`docs/specs/promo-code-policy.feature`)
-- **Format**: Must be non-empty and **exactly 6 characters** long (e.g., `SAVE10`).
-- **Discount Percentage**: Range is `1% - 100%`.
-- **Expiration**: Checked against current evaluation date (`IsValid(currentDate)`).
-
-### 3. Shopping Cart Policy (`docs/specs/shopping-cart-policy.feature`)
-- Empty cart calculates total as `0.00`.
-- Promo codes apply discount to the subtotal of items.
-- Applying an expired or invalid promo code throws an `InvalidOperationException`.
-
----
-
-## 🔄 TDD Automation Lifecycle (`run-tdd-cycle.cmd`)
-
-The project uses an automated TDD controller script to enforce code quality and Git discipline:
-
-1. **Execution**: Compiles code and runs unit tests via `dotnet test`.
-2. **On GREEN State**: Automatically stages modified files in `src/` and `docs/specs/`, committing them with an English commit message.
-3. **On RED State**: Automatically rolls back repository changes (`git reset --hard HEAD` and `git clean -fd src/`) to guarantee the main branch never stays in a broken state.
-
-### Running the TDD Engine
-Execute in your terminal or Far Manager:
-
-```cmd
-run-tdd-cycle.cmd
-```
+## 📜 License
+MIT

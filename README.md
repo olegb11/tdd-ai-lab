@@ -90,7 +90,7 @@ The standard TDD cycle. It is **never blocked** by mutants; test failures trigge
 ### Feature Finalization (`run-tdd-cycle.cmd --full` - planned gate)
 
 1. Complete the Fast Loop until the suite is green (code + refactor).
-2. Run `run-tdd-cycle.cmd --full` (planned gate), which invokes `dotnet stryker`. Stryker.NET mutates `src/Domain/` per `stryker-config.json` (thresholds: high 80 / low 60 / break 60) and re-runs the suite for each mutant.
+2. Run `run-tdd-cycle.cmd --full` (planned gate), which invokes `dotnet stryker --break-at 100`. Stryker.NET mutates `src/Domain/` per `stryker-config.json` (thresholds: high 80 / low 60; the script enforces `break` at 100, i.e. zero surviving mutants) and re-runs the suite for each mutant.
 3. **All mutants killed** -> the script proceeds with the final Auto-Commit.
 4. **A mutant survived** -> the script reports: *"Your tests missed a bug: [mutation description]"*:
    - **No `git rollback`** - the implementation is correct, this is not a false red.

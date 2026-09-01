@@ -15,7 +15,7 @@ public class Item
 
     public static Item Create(decimal price, int quantity, decimal discount)
     {
-        // Temporary stub without validation for RED phase verification
+        // TODO: Enforce domain invariants (Price >= 0, Quantity >= 1, Discount 0..100)
         return new Item(price, quantity, discount);
     }
 }

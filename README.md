@@ -1,7 +1,7 @@
 # 🧪 tdd-ai-lab
 
 > **A Laboratory for Deterministic, AI-Driven TDD Methodology.**  
-> *Executable Specs -> Red Tests (Human) -> Green Code (LLM) -> Automatic Rollback.*
+> *Red Test -> Green Code -> (Test Fail? -> Rollback) -> Refactor -> Auto-Commit.*
 
 ## 🎯 Manifesto & Core Principles
 
@@ -14,6 +14,7 @@ Modern "Vibe Coding" and stateful chat-based AI development inevitably lead to *
 2. **Human Owns the Red Phase:** LLMs are strictly forbidden from writing unit tests or business constraints on their own from raw natural language.
 3. **Executable Specs First:** Business invariants and domain logic must be formalized in Git before any implementation begins.
 4. **Binary Compiler Arbitration:** Code is accepted ONLY if `dotnet test` returns `PASS` (Green). Any error or failing test leads to an immediate `git rollback`.
+5. **Human Owns the Refactor Decision:** The LLM may generate refactoring variants, but only the Human decides whether the code has genuinely improved. The automated test suite guarantees that observable behavior has not changed.
 
 ## 🏗️ 3-Layer Architecture
 
@@ -68,16 +69,16 @@ tdd-ai-lab/
 
 ## 🔄 The Development Cycle (Step-by-Step)
 
-[1. Edit Spec] -> [2. Write Red Test] -> [3. Generate Green Code] -> [4. Run tdd-cycle.cmd] -> [5. Commit / Rollback]
+Red Test -> Green Code -> (Test Fail? -> Rollback) -> Refactor -> Auto-Commit
 
-1. **Formalize Requirement:** Define or update a business rule in `docs/specs/*.feature`.
-2. **Write RED Test (Human):** Add a failing test case in `src/Domain.Tests/`. Verify failure via `dotnet test`.
+1. **Edit Spec (Human):** Define or update a business rule in `docs/specs/*.feature`.
+2. **Write RED Test (Human):** Add a failing test case in `src/Domain.Tests/`. Verify it fails via `dotnet test`.
 3. **Generate GREEN Code (LLM):** Implement the minimal C# code in `src/Domain/` required to make the failing test pass.
-4. **Run the TDD Arbiter:** Execute the local transaction script:
-   run-tdd-cycle.cmd
-5. **Arbitration & Transaction:**
-   * If `dotnet test` **PASSES** -> Automatic Git Commit.
-   * If `dotnet test` **FAILS** -> Immediate `git checkout` (Rollback to clean state).
+4. **Arbiter Check:** Execute the local transaction script:
+   - `run-tdd-cycle.cmd`
+   - If `dotnet test` **FAILS** -> `git reset --hard HEAD` + `git clean -fd src/` (rollback to the last green state).
+5. **Refactor:** The LLM generates refactoring variants, but only the Human decides whether the code has genuinely improved. The test suite must stay green and guarantees that observable behavior has not changed.
+6. **Auto-Commit:** If `dotnet test` **PASSES**, the script creates an automatic Git commit of the green, refactored state.
 
 ## 🛠️ Stack
 * **Language:** C# / .NET 8+

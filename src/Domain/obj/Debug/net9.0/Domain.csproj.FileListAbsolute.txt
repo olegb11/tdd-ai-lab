@@ -1,0 +1,12 @@
+C:\Projects\tdd-ai-lab\src\Domain\bin\Debug\net9.0\Domain.deps.json
+C:\Projects\tdd-ai-lab\src\Domain\bin\Debug\net9.0\Domain.dll
+C:\Projects\tdd-ai-lab\src\Domain\bin\Debug\net9.0\Domain.pdb
+C:\Projects\tdd-ai-lab\src\Domain\obj\Debug\net9.0\Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\tdd-ai-lab\src\Domain\obj\Debug\net9.0\Domain.AssemblyInfoInputs.cache
+C:\Projects\tdd-ai-lab\src\Domain\obj\Debug\net9.0\Domain.AssemblyInfo.cs
+C:\Projects\tdd-ai-lab\src\Domain\obj\Debug\net9.0\Domain.csproj.CoreCompileInputs.cache
+C:\Projects\tdd-ai-lab\src\Domain\obj\Debug\net9.0\Domain.sourcelink.json
+C:\Projects\tdd-ai-lab\src\Domain\obj\Debug\net9.0\Domain.dll
+C:\Projects\tdd-ai-lab\src\Domain\obj\Debug\net9.0\refint\Domain.dll
+C:\Projects\tdd-ai-lab\src\Domain\obj\Debug\net9.0\Domain.pdb
+C:\Projects\tdd-ai-lab\src\Domain\obj\Debug\net9.0\ref\Domain.dll

@@ -15,3 +15,6 @@
 ## OS generated files
 Thumbs.db
 [Dd]esktop.ini
+
+## Stryker mutation testing
+StrykerOutput/

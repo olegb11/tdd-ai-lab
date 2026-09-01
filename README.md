@@ -16,8 +16,8 @@ Modern "Vibe Coding" and stateful chat-based AI development inevitably lead to *
 3. **Executable Specs First:** Business invariants and domain logic must be formalized in Git before any implementation begins.
 4. **Binary Compiler Arbitration:** Code is accepted ONLY if `dotnet test` returns `PASS` (Green). Any error or failing test leads to an immediate `git rollback`.
 5. **Human Owns the Refactor Decision:** The LLM may generate refactoring variants, but only the Human decides whether the code has genuinely improved. The automated test suite guarantees that observable behavior has not changed.
-6. **Mutation Guard (Feature Finalization Only):** A green suite is necessary but not sufficient - a test can formally pass yet verify nothing (missing `Assert`, wrong condition). The Mutation Agent deliberately mutates the domain code (`+` -> `-`, `>` -> `>=`, `!=` -> `==`, removed calls) and re-runs the suite. A surviving mutant is a bug your tests missed.
-7. **Fast Loop vs. Finalization:** The ordinary TDD fast loop is never blocked by mutants. Mutation checking runs only on feature finalization (`run-tdd-cycle.cmd --full`, planned gate): a surviving mutant blocks the **Auto-Commit only** - never the code (no rollback, the implementation is correct).
+6. **Mutation Guard (Feature Finalization Only):** A green suite is necessary but not sufficient - a test can formally pass yet verify nothing (missing `Assert`, wrong condition). The Mutation Agent is powered by **Stryker.NET** (`dotnet stryker`), which deliberately mutates the domain code (conditional, arithmetic, LINQ, statement-removal mutations) and re-runs the suite for each mutant. A surviving mutant is a bug your tests missed.
+7. **Fast Loop vs. Finalization:** The ordinary TDD fast loop is never blocked by mutants. Mutation checking runs only on feature finalization (`run-tdd-cycle.cmd --full`, planned gate; invokes `dotnet stryker`): a surviving mutant blocks the **Auto-Commit only** - never the code (no rollback, the implementation is correct).
 
 ## 🏗️ 3-Layer Architecture
 
@@ -90,7 +90,7 @@ The standard TDD cycle. It is **never blocked** by mutants; test failures trigge
 ### Feature Finalization (`run-tdd-cycle.cmd --full` - planned gate)
 
 1. Complete the Fast Loop until the suite is green (code + refactor).
-2. Run `run-tdd-cycle.cmd --full`. The Mutation Agent mutates `src/Domain/` (e.g. flips `+` to `-`, `>` to `>=`, `!=` to `==`, deletes a method call) and re-runs the suite for each mutant.
+2. Run `run-tdd-cycle.cmd --full` (planned gate), which invokes `dotnet stryker`. Stryker.NET mutates `src/Domain/` per `stryker-config.json` (thresholds: high 80 / low 60 / break 60) and re-runs the suite for each mutant.
 3. **All mutants killed** -> the script proceeds with the final Auto-Commit.
 4. **A mutant survived** -> the script reports: *"Your tests missed a bug: [mutation description]"*:
    - **No `git rollback`** - the implementation is correct, this is not a false red.
@@ -99,24 +99,26 @@ The standard TDD cycle. It is **never blocked** by mutants; test failures trigge
 
 ## 🧬 Mutation Agent
 
-In ordinary TDD a test can pass (Green) yet verify nothing - for example, a forgotten `Assert` or a wrong condition. The Mutation Agent closes that gap by deliberately corrupting the domain code:
+In ordinary TDD a test can pass (Green) yet verify nothing - for example, a forgotten `Assert` or a wrong condition. The Mutation Agent closes that gap by running **Stryker.NET** (`dotnet stryker`), which deliberately corrupts the domain code:
 
-- `+` -> `-`
-- `>` -> `>=`
-- `a != b` -> `a == b`
-- `if (code.Length != 6)` -> `if (code.Length == 6)`
-- removed method calls
+- arithmetic flips: `+` <-> `-`, `>` <-> `>=`
+- logical flips: `a != b` <-> `a == b`
+- LINQ flips: `Sum()` -> `Max()`
+- statement removal (removed method calls, removed `if` bodies)
 
-For each mutant the agent re-runs the test suite:
+For each mutant the agent re-runs the test suite (see `stryker-config.json`):
 
 - **Killed:** at least one test fails -> the suite genuinely guards this behavior.
 - **Survived:** all tests still pass -> the suite is blind to this behavior -> the agent reports to the Human: *"Your tests missed a bug: [mutation description]"*.
 
 The Mutation Agent runs on feature finalization only (`run-tdd-cycle.cmd --full`, planned gate), never inside the fast loop. It never rolls back the implementation - it guards the **tests**, not the code.
 
+First run (2026-09-02): **52 killed / 13 survived** mutants in `src/Domain/` -> the Human owns the follow-up Red tests that close the blind spots.
+
 ## 🛠️ Stack
 * **Language:** C# / .NET 8+
 * **Testing Framework:** xUnit (Assert)
+* **Mutation Testing:** Stryker.NET (`dotnet-stryker`, requires .NET 10 runtime for the tool)
 * **AI Engine:** Stateless API Payload (Claude / OpenAI / Local LLM)
 * **Control:** Windows CMD (run-tdd-cycle.cmd) / Git CLI
 

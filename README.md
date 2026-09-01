@@ -82,7 +82,7 @@ Red Test -> Green Code -> (Test Fail? -> Rollback) -> Refactor -> Auto-Commit
 
 ## 🛠️ Stack
 * **Language:** C# / .NET 8+
-* **Testing Framework:** xUnit, FluentAssertions
+* **Testing Framework:** xUnit (Assert)
 * **AI Engine:** Stateless API Payload (Claude / OpenAI / Local LLM)
 * **Control:** Bash / Git CLI Hooks
 

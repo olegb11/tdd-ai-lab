@@ -19,10 +19,12 @@ public class ItemTests
         Assert.Contains(expectedMessage, ex.Message);
     }
 
-    [Fact]
-    public void Create_InvalidQuantity_ThrowsArgumentException()
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void Create_InvalidQuantity_ThrowsArgumentException(int quantity)
     {
         // Arrange & Act & Assert
-        Assert.Throws<ArgumentException>(() => Item.Create(100.0m, -1, 0));
+        Assert.Throws<ArgumentException>(() => Item.Create(100.0m, quantity, 0));
     }
 }

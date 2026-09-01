@@ -40,7 +40,7 @@ public class CartTests
     {
         // Arrange
         var cart = new Cart();
-        var expiredPromo = PromoCode.Create("EXPIRED", 20, DateTime.UtcNow.AddDays(-1));
+        var expiredPromo = PromoCode.Create("OLDD10", 20, DateTime.UtcNow.AddDays(-1));
 
         // Act & Assert
         var ex = Assert.Throws<InvalidOperationException>(() =>

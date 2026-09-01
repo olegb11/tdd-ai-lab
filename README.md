@@ -68,13 +68,14 @@ tdd-ai-lab/
 
 ## 🔄 The Development Cycle (Step-by-Step)
 
-[1. Edit Spec] -> [2. Write Red Test] -> [3. Run tdd-step.sh] -> [4. Commit / Rollback]
+[1. Edit Spec] -> [2. Write Red Test] -> [3. Generate Green Code] -> [4. Run tdd-cycle.cmd] -> [5. Commit / Rollback]
 
-1. **Formalize Requirement:** Define or update a business rule in `docs/specs/*.md`.
+1. **Formalize Requirement:** Define or update a business rule in `docs/specs/*.feature`.
 2. **Write RED Test (Human):** Add a failing test case in `src/Domain.Tests/`. Verify failure via `dotnet test`.
-3. **Trigger AI Generation:** Run the local transaction CLI:
-   ./tdd-step.sh "Implement percentage discount calculation"
-4. **Arbitration & Transaction:**
+3. **Generate GREEN Code (LLM):** Implement the minimal C# code in `src/Domain/` required to make the failing test pass.
+4. **Run the TDD Arbiter:** Execute the local transaction script:
+   run-tdd-cycle.cmd
+5. **Arbitration & Transaction:**
    * If `dotnet test` **PASSES** -> Automatic Git Commit.
    * If `dotnet test` **FAILS** -> Immediate `git checkout` (Rollback to clean state).
 

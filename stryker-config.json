@@ -11,8 +11,8 @@
       "json"
     ],
     "thresholds": {
-      "high": 80,
-      "low": 60,
+      "high": 100,
+      "low": 100,
       "break": 100
     },
     "coverage-analysis": "perTest",

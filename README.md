@@ -84,7 +84,7 @@ Red Test -> Green Code -> (Test Fail? -> Rollback) -> Refactor -> Auto-Commit
 * **Language:** C# / .NET 8+
 * **Testing Framework:** xUnit (Assert)
 * **AI Engine:** Stateless API Payload (Claude / OpenAI / Local LLM)
-* **Control:** Bash / Git CLI Hooks
+* **Control:** Windows CMD (run-tdd-cycle.cmd) / Git CLI
 
 ## 📜 License
 MIT

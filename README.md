@@ -40,21 +40,31 @@ LLM generates the absolute minimum C# implementation to pass the current failing
 
 ## 📂 Repository Structure
 
+```text
 tdd-ai-lab/
 ├── docs/
 │   └── specs/
-│       └── discount-policy.md      # Layer 1: Executable Specs & Invariants
+│       ├── discount-policy.feature
+│       ├── promo-code-policy.feature
+│       └── shopping-cart-policy.feature
 ├── src/
 │   ├── Domain/
-│   │   ├── Item.cs                 # Layer 3: Implementation Code
-│   │   └── Calculator.cs
+│   │   ├── Calculator.cs
+│   │   ├── Cart.cs
+│   │   ├── Domain.csproj
+│   │   ├── Item.cs
+│   │   └── PromoCode.cs
 │   └── Domain.Tests/
-│       ├── ItemTests.cs            # Layer 2: Red Phase (Type Invariants)
-│       └── CalculatorTests.cs      # Layer 2: Red Phase (Business Logic)
-├── scripts/
-│   └── generate_green.py            # Stateless AI execution trigger
-├── tdd-step.sh                      # Transactional CLI Arbiter (Red-Green-Rollback)
+│       ├── CalculatorTests.cs
+│       ├── CartTests.cs
+│       ├── Domain.Tests.csproj
+│       ├── ItemTests.cs
+│       └── PromoCodeTests.cs
+├── .gitignore
+├── README.md
+├── run-tdd-cycle.cmd
 └── tdd-ai-lab.sln
+```
 
 ## 🔄 The Development Cycle (Step-by-Step)
 

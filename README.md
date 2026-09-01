@@ -20,7 +20,7 @@ Modern "Vibe Coding" and stateful chat-based AI development inevitably lead to *
 
 Knowledge and state are passed between iterations exclusively through **formal artifacts** (C#, Types, Executable Specs), never through ambiguous natural language prompts.
 
-Layer 1: Executable Specs & Invariants (Git / Markdown)
+Layer 1: Executable Specs & Invariants (Git / Gherkin .feature)
    |
    +--> (Human Domain Translation)
    |

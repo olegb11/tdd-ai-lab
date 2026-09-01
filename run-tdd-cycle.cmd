@@ -16,7 +16,7 @@ if %ERRORLEVEL% EQU 0 (
     echo ------------------------------------------
     echo [SUCCESS] All tests passed! Committing Green state.
     echo ------------------------------------------
-    git add src/
+    git add src/ docs/specs/
     git commit -m "green: automated pass - implementation meets specifications"
     echo [GIT] Green state committed successfully.
     exit /b 0

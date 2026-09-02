@@ -56,4 +56,38 @@ public class PromoCodeTests
             Assert.Equal("Promo code must be 6 characters", ex.Message);
         }
     }
+
+    [Fact]
+    public void Create_MinDiscount_IsAllowed()
+    {
+        var promo = PromoCode.Create("SAVE10", 1, DateTime.UtcNow.AddDays(7));
+
+        Assert.Equal("SAVE10", promo.Code);
+        Assert.Equal(1m, promo.DiscountPercent);
+    }
+
+    [Fact]
+    public void Create_MaxDiscount_IsAllowed()
+    {
+        var promo = PromoCode.Create("SAVE10", 100, DateTime.UtcNow.AddDays(7));
+
+        Assert.Equal("SAVE10", promo.Code);
+        Assert.Equal(100m, promo.DiscountPercent);
+    }
+
+    [Fact]
+    public void IsValid_ExpiresToday_ReturnsTrue()
+    {
+        var promo = PromoCode.Create("TODAY1", 10, expirationDate: DateTime.UtcNow.Date);
+
+        Assert.True(promo.IsValid(DateTime.UtcNow.Date));
+    }
+
+    [Fact]
+    public void IsValid_ExpiresToday_ReturnsFalseOnNextDay()
+    {
+        var promo = PromoCode.Create("TODAY2", 10, expirationDate: DateTime.UtcNow.Date);
+
+        Assert.False(promo.IsValid(DateTime.UtcNow.Date.AddDays(1)));
+    }
 }

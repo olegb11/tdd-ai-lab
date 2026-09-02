@@ -26,4 +26,25 @@ public class CalculatorTests
 
         Assert.Equal(expected, total);
     }
+
+    [Fact]
+    public void GetTotal_NullItems_ReturnsZero()
+    {
+        var result = _calculator.GetTotalByProducts(null!);
+        Assert.Equal(0m, result);
+    }
+
+    [Fact]
+    public void GetTotal_MultipleItems_SumsEachItemTotal()
+    {
+        var items = new[]
+        {
+            Item.Create(100.0m, 1, 0),  // 100.0
+            Item.Create(50.0m, 2, 20)   // 80.0
+        };
+
+        var total = _calculator.GetTotalByProducts(items);
+
+        Assert.Equal(180.0m, total);
+    }
 }

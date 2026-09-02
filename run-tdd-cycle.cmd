@@ -52,11 +52,13 @@ dotnet stryker --break-at 100
 set "STRYKER_EXIT=%ERRORLEVEL%"
 
 :: Find the newest Stryker report directory to read the Markdown summary.
-for /f "delims=" %%D in ('dir /b /ad /o-d "StrykerOutput" 2^>nul') do (
-    set "LATEST_STRYKER_DIR=%%D"
-    goto :STRYKER_MD_FOUND
+set "LATEST_STRYKER_DIR="
+if exist "StrykerOutput" (
+    for /f "delims=" %%D in ('dir /b /ad /o-d "StrykerOutput" 2^>nul') do (
+        if not defined LATEST_STRYKER_DIR set "LATEST_STRYKER_DIR=%%D"
+    )
 )
-:STRYKER_MD_FOUND
+
 set "STRYKER_MD="
 if defined LATEST_STRYKER_DIR (
     if exist "StrykerOutput\%LATEST_STRYKER_DIR%\reports\mutation-report.md" (
@@ -76,7 +78,7 @@ if not defined STRYKER_MD (
 findstr /C:"N/A" "%STRYKER_MD%" >nul 2>nul
 if %ERRORLEVEL% EQU 0 (
     echo.
-    echo [FAIL] [MUTATION GATE FAILED] Stryker tested no mutants (score is N/A).
+    echo [FAIL] [MUTATION GATE FAILED] Stryker tested no mutants [score is N/A].
     echo [INFO] No rollback performed. Fix the Stryker configuration, then re-run the gate.
     exit /b 2
 )

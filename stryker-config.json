@@ -4,6 +4,9 @@
     "project": "src/Domain/Domain.csproj",
     "reporters": [
       "progress",
+      "dots",
+      "cleartext",
+      "markdown",
       "html",
       "json"
     ],

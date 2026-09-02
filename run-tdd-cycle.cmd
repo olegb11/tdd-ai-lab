@@ -46,34 +46,51 @@ if %ERRORLEVEL% NEQ 0 (
     dotnet tool install --global dotnet-stryker
 )
 
-dotnet stryker --break-at 100 > "%TEMP%\stryker-gate.log" 2>&1
+:: Run Stryker directly - output streams straight to the console in real time
+:: (dots / cleartext / progress reporters). No log redirection needed.
+dotnet stryker --break-at 100
 set "STRYKER_EXIT=%ERRORLEVEL%"
 
-type "%TEMP%\stryker-gate.log"
+:: Find the newest Stryker report directory to read the Markdown summary.
+for /f "delims=" %%D in ('dir /b /ad /o-d "StrykerOutput" 2^>nul') do (
+    set "LATEST_STRYKER_DIR=%%D"
+    goto :STRYKER_MD_FOUND
+)
+:STRYKER_MD_FOUND
+set "STRYKER_MD="
+if defined LATEST_STRYKER_DIR (
+    if exist "StrykerOutput\%LATEST_STRYKER_DIR%\reports\mutation-report.md" (
+        set "STRYKER_MD=StrykerOutput\%LATEST_STRYKER_DIR%\reports\mutation-report.md"
+    )
+)
 
-:: Guard: Stryker must have actually tested mutants. If no mutation score was
-:: calculated (0 mutants tested / all ignored / all compile errors), the gate
-:: FAILED - it is NOT a green "100 percent" pass.
-findstr /C:"unable to calculate a mutation score" /C:"all mutants with tests were ignored" /C:"all mutants resulted in compile errors" "%TEMP%\stryker-gate.log" >nul 2>nul
-if %ERRORLEVEL% EQU 0 (
+:: Guard 1: no Markdown report means Stryker produced no score -> FAIL (not a pass).
+if not defined STRYKER_MD (
     echo.
-    echo [FAIL] [MUTATION GATE FAILED] Stryker did not test any mutant - no mutation score was produced.
+    echo [FAIL] [MUTATION GATE FAILED] Stryker did not produce a mutation score.
     echo [INFO] No rollback performed. Fix the Stryker configuration, then re-run the gate.
-    del "%TEMP%\stryker-gate.log" >nul 2>nul
     exit /b 2
 )
 
+:: Guard 2: Markdown score column must not be N/A (no mutants tested -> FAIL).
+findstr /C:"N/A" "%STRYKER_MD%" >nul 2>nul
+if %ERRORLEVEL% EQU 0 (
+    echo.
+    echo [FAIL] [MUTATION GATE FAILED] Stryker tested no mutants (score is N/A).
+    echo [INFO] No rollback performed. Fix the Stryker configuration, then re-run the gate.
+    exit /b 2
+)
+
+:: Guard 3: nonzero Stryker exit code -> surviving mutants -> FAIL.
 if %STRYKER_EXIT% NEQ 0 (
     echo.
     echo [FAIL] [MUTATION GATE FAILED] One or more mutants SURVIVED!
     echo [INFO] Your domain implementation is correct, but your tests have blind spots.
     echo        No rollback performed. Write an additional RED test in Domain.Tests to kill the mutant,
     echo        then run Fast Loop again.
-    del "%TEMP%\stryker-gate.log" >nul 2>nul
     exit /b 2
 )
 
-del "%TEMP%\stryker-gate.log" >nul 2>nul
 echo [OK] [MUTATION GATE PASSED] All mutants killed! Test suite coverage is 100 percent.
 
 :AUTO_COMMIT

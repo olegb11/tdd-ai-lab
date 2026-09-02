@@ -15,9 +15,10 @@ public class AdditionBfTests
         // Arrange
         byte[] input = new byte[] { a, b };
 
-        // Act & Assert
+        // Act
         byte[] output = BfInterpreter.Execute(BfPrograms.Addition, input);
 
+        // Assert
         Assert.Single(output);
         Assert.Equal(expected, output[0]);
     }

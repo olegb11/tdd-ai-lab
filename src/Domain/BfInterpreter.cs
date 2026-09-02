@@ -1,7 +1,17 @@
 ﻿namespace Domain;
 
+/// <summary>
+/// Lightweight Brainfuck interpreter for executing embedded programs in memory.
+/// </summary>
 public static class BfInterpreter
 {
+    /// <summary>
+    /// Executes a Brainfuck program with the given input bytes.
+    /// </summary>
+    /// <param name="code">The Brainfuck source code string.</param>
+    /// <param name="input">The array of input bytes.</param>
+    /// <param name="maxSteps">Safety guard against infinite loops.</param>
+    /// <returns>An array of output bytes emitted by the '.' instruction.</returns>
     public static byte[] Execute(string code, byte[] input, int maxSteps = 100_000)
     {
         var memory = new byte[30000];

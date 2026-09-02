@@ -2,7 +2,7 @@
 
 > **A Laboratory for Deterministic, AI-Driven TDD Methodology.**  
 > *Fast Loop: Red Test -> Green Code -> (Test Fail? -> Rollback) -> Refactor -> Auto-Commit.*
-> *Feature Finalization: + Mutation Check (`run-tdd-cycle.cmd --full`, planned gate) before the final Auto-Commit.*
+> *Feature Finalization: + Mutation Check (`run-tdd-cycle.cmd --full`) before the final Auto-Commit.*
 
 ## 🎯 Manifesto & Core Principles
 
@@ -17,7 +17,7 @@ Modern "Vibe Coding" and stateful chat-based AI development inevitably lead to *
 4. **Binary Compiler Arbitration:** Code is accepted ONLY if `dotnet test` returns `PASS` (Green). Any error or failing test leads to an immediate `git rollback`.
 5. **Human Owns the Refactor Decision:** The LLM may generate refactoring variants, but only the Human decides whether the code has genuinely improved. The automated test suite guarantees that observable behavior has not changed.
 6. **Mutation Guard (Feature Finalization Only):** A green suite is necessary but not sufficient - a test can formally pass yet verify nothing (missing `Assert`, wrong condition). The Mutation Agent is powered by **Stryker.NET** (`dotnet stryker`), which deliberately mutates the domain code (conditional, arithmetic, LINQ, statement-removal mutations) and re-runs the suite for each mutant. A surviving mutant is a bug your tests missed.
-7. **Fast Loop vs. Finalization:** The ordinary TDD fast loop is never blocked by mutants. Mutation checking runs only on feature finalization (`run-tdd-cycle.cmd --full`, planned gate; invokes `dotnet stryker`): a surviving mutant blocks the **Auto-Commit only** - never the code (no rollback, the implementation is correct).
+7. **Fast Loop vs. Finalization:** The ordinary TDD fast loop is never blocked by mutants. Mutation checking runs only on feature finalization (`run-tdd-cycle.cmd --full`; invokes `dotnet stryker`): a surviving mutant blocks the **Auto-Commit only** - never the code (no rollback, the implementation is correct).
 
 ## 🏗️ 3-Layer Architecture
 
@@ -87,10 +87,10 @@ The standard TDD cycle. It is **never blocked** by mutants; test failures trigge
 5. **Refactor:** The LLM generates refactoring variants, but only the Human decides whether the code has genuinely improved. The test suite must stay green and guarantees that observable behavior has not changed.
 6. **Auto-Commit:** If `dotnet test` **PASSES**, the script creates an automatic Git commit of the green, refactored state.
 
-### Feature Finalization (`run-tdd-cycle.cmd --full` - planned gate)
+### Feature Finalization (`run-tdd-cycle.cmd --full`)
 
 1. Complete the Fast Loop until the suite is green (code + refactor).
-2. Run `run-tdd-cycle.cmd --full` (planned gate), which invokes `dotnet stryker --break-at 100`. Stryker.NET mutates `src/Domain/` per `stryker-config.json` (thresholds: high 80 / low 60; the script enforces `break` at 100, i.e. zero surviving mutants) and re-runs the suite for each mutant.
+2. Run `run-tdd-cycle.cmd --full`, which invokes `dotnet stryker --break-at 100`. Stryker.NET mutates `src/Domain/` per `stryker-config.json` (thresholds: high 80 / low 60; the script enforces `break` at 100, i.e. zero surviving mutants) and re-runs the suite for each mutant.
 3. **All mutants killed** -> the script proceeds with the final Auto-Commit.
 4. **A mutant survived** -> the script reports: *"Your tests missed a bug: [mutation description]"*:
    - **No `git rollback`** - the implementation is correct, this is not a false red.
@@ -111,7 +111,7 @@ For each mutant the agent re-runs the test suite (see `stryker-config.json`):
 - **Killed:** at least one test fails -> the suite genuinely guards this behavior.
 - **Survived:** all tests still pass -> the suite is blind to this behavior -> the agent reports to the Human: *"Your tests missed a bug: [mutation description]"*.
 
-The Mutation Agent runs on feature finalization only (`run-tdd-cycle.cmd --full`, planned gate), never inside the fast loop. It never rolls back the implementation - it guards the **tests**, not the code.
+The Mutation Agent runs on feature finalization only (`run-tdd-cycle.cmd --full`), never inside the fast loop. It never rolls back the implementation - it guards the **tests**, not the code.
 
 First run (2026-09-02): **52 killed / 13 survived** mutants in `src/Domain/` -> the Human owns the follow-up Red tests that close the blind spots.
 

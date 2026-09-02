@@ -2,9 +2,6 @@
   "stryker-config": {
     "solution": "tdd-ai-lab.sln",
     "project": "src/Domain/Domain.csproj",
-    "mutate": [
-      "src/Domain/**/*.cs"
-    ],
     "reporters": [
       "progress",
       "html",
